@@ -18,6 +18,7 @@
 #
 # Author:
 #   meshachjackson
+# TODO: Refactor?
 
 module.exports = (robot) ->
 
@@ -72,6 +73,7 @@ module.exports = (robot) ->
       user = @getMe(msg)
       a = user.aliases[context]
 
+      # TODO: Make this response prettier.
       if (a)
         astr = JSON.stringify(a)
         "Here is what I know about the #{context} context:\n#{astr}"
@@ -111,40 +113,65 @@ module.exports = (robot) ->
       user.aliases = {}
       "Hope you knew what you were doing!"
 
-# ROUTES
+  # 
+  # Responders
+  # 
+
+  # hubot: "You are now known as #{alias} on #{context}"
   robot.respond /i am ([a-z0-9-]+) on ([a-z0-9-]+)/i, (msg) ->
     robot.alias = robot.alias or new Alias
     msg.send robot.alias.setAlias(msg)
 
+
+  # hubot: "You are now known as undefined on #{context}"
   robot.respond /forget me on ([a-z0-9-]+)/i, (msg) ->
     robot.alias = robot.alias or new Alias
     msg.send robot.alias.forgetAlias(msg)
 
+
+  # hubot: if (alias)
+  #   "You are known as #{alias.name} on #{context}"
+  # else
+  #   "You are not known in that context."
   robot.respond /who am i on ([a-z0-9-]+)/i, (msg) ->
     robot.alias = robot.alias or new Alias
     msg.send robot.alias.getAlias(msg)
 
+
+  # hubot: "Here are the aliases I know:"
   robot.respond /show my alias(es)?/i, (msg) ->
     robot.alias = robot.alias or new Alias
     msg.send robot.alias.listMyAlias(msg)
 
+
+  # hubot: 
   robot.respond /show all alias(es)?/i, (msg) ->
     robot.alias = robot.alias or new Alias
     msg.send robot.alias.listAllAlias(msg)
 
+
+  # hubot: ""
   robot.respond /show my context ([a-z0-9-]+)/i, (msg) ->
     robot.alias = robot.alias or new Alias
     msg.send robot.alias.showMyContext(msg)
 
+
+  # hubot: "Hope you knew what you were doing!"
   robot.respond /clear my alias(es)?/i, (msg) ->
     robot.alias = robot.alias or new Alias
     msg.send robot.alias.clearMyAliases(msg)
 
+
+  # hubot: "You are now known as #{c.name} on #{context} with #{prop} as #{val}"
   robot.respond /update context ([a-z0-9-]+) with (key|url|name) ([a-z0-9-]+)/i, (msg) ->
     robot.alias = robot.alias or new Alias
     msg.send robot.alias.updateMyAlias(msg)
 
-# listeners
+  # TODO: store the users in the default \'cache\' location, to avoid double-storage.
+  # TODO: check for cached results before checking the api (BUT STILL EMIT EVENTS)
+  # TODO: sync users from HipChat with the users on Codebase, so we can begin to link identities.
+
+  # Events
   robot.brain.on "alias_context_update", (args) ->
     robot.alias = robot.alias or new Alias
-    args.msg.send "NEW ALIAS!\nTODO: store the users in the default \'cache\' location, to avoid double-storage.\nTODO: check for cached results before checking the api (BUT STILL EMIT EVENTS)\nTODO: sync users from HipChat with the users on Codebase, so we can begin to link identities."
+    args.msg.send "NEW ALIAS!"
